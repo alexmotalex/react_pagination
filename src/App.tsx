@@ -6,44 +6,18 @@ import { Pagination } from './components/Pagination';
 const items = getNumbers(1, 42).map(n => `Item ${n}`);
 
 export const App: React.FC = () => {
-  const [itemsPerPage, setItemsPerPage] = useState('5');
-  const [currentPage, setCurrentPage] = useState(1);
-  const parsedPerPage = parseInt(itemsPerPage, 10);
-  const totalItems = items.length;
-  const totalPages = Math.ceil(totalItems / parsedPerPage);
-  const startIndex = (currentPage - 1) * parsedPerPage;
-  const endIndex = Math.min(startIndex + parsedPerPage, totalItems);
+  const TOTAL_ITEMS = items.length;
+  const INIT_ITEMS_PER_PAGE = 5;
+  const INIT_CURRENT_PAGE = 1;
+  const [itemsPerPage, setItemsPerPage] = useState(INIT_ITEMS_PER_PAGE);
+  const [currentPage, setCurrentPage] = useState(INIT_CURRENT_PAGE);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, TOTAL_ITEMS);
   const currentItems = items.slice(startIndex, endIndex);
 
   function handleItemsPerPage(e: React.ChangeEvent<HTMLSelectElement>): void {
-    setItemsPerPage(e.target.value);
+    setItemsPerPage(parseInt(e.target.value, 10));
     setCurrentPage(1);
-  }
-
-  function handleChange(e: React.MouseEvent<HTMLUListElement>): void {
-    const target = e.target as HTMLElement;
-
-    if (target.getAttribute('aria-disabled') === 'true') {
-      return;
-    }
-
-    const dataCy = target.dataset.cy;
-
-    if (dataCy === 'pageLink') {
-      const clickedPage = +(target.textContent?.trim() || 0);
-
-      if (clickedPage && clickedPage !== currentPage) {
-        setCurrentPage(clickedPage);
-      }
-    }
-
-    if (dataCy === 'nextLink' && currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-    }
-
-    if (dataCy === 'prevLink' && currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
   }
 
   return (
@@ -51,7 +25,7 @@ export const App: React.FC = () => {
       <h1>Items with Pagination</h1>
 
       <p className="lead" data-cy="info">
-        {`Page ${currentPage} (items ${startIndex + 1} - ${endIndex} of ${totalItems})`}
+        {`Page ${currentPage} (items ${startIndex + 1} - ${endIndex} of ${TOTAL_ITEMS})`}
       </p>
 
       <div className="form-group row">
@@ -77,10 +51,10 @@ export const App: React.FC = () => {
       </div>
 
       <Pagination
-        total={items.length}
-        perPage={parsedPerPage}
+        total={TOTAL_ITEMS}
+        perPage={itemsPerPage}
         currentPage={currentPage}
-        onPageChange={handleChange}
+        onPageChange={setCurrentPage}
       />
 
       <ul>
